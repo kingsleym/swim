@@ -1,0 +1,747 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>USA Swimming 2024-2028 Motivational Standards</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .filters-section {
+            padding: 20px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #ddd;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            font-size: 13px;
+            color: #333;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        select, input {
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .search-box {
+            grid-column: 1 / -1;
+        }
+
+        .search-box input {
+            width: 100%;
+        }
+
+        .reset-btn {
+            grid-column: 1 / -1;
+            padding: 10px 15px;
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .reset-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+        }
+
+        .results-info {
+            padding: 15px 20px;
+            background: #e7f3ff;
+            border-bottom: 1px solid #b3d9ff;
+            font-size: 14px;
+            color: #004085;
+            font-weight: 500;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            position: sticky;
+            top: 0;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s ease;
+        }
+
+        th:hover {
+            opacity: 0.9;
+            box-shadow: inset 0 -2px 0 rgba(255,255,255,0.2);
+        }
+
+        th.sortable::after {
+            content: ' ⇅';
+            opacity: 0.5;
+            font-size: 12px;
+        }
+
+        th.sort-asc::after {
+            content: ' ↑';
+            opacity: 1;
+        }
+
+        th.sort-desc::after {
+            content: ' ↓';
+            opacity: 1;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .event-cell {
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .qualification-cell {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 4px;
+            padding: 2px 8px;
+            font-weight: 600;
+            display: inline-block;
+            font-size: 12px;
+        }
+
+        .qual-aaaa { background: #1a1a1a; }
+        .qual-aaa { background: #333333; }
+        .qual-aa { background: #555555; }
+        .qual-a { background: #777777; }
+        .qual-bb { background: #999999; }
+        .qual-b { background: #bbbbbb; color: #333; }
+
+        .time-cell {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .metadata-cell {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .no-results-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 20px;
+            }
+
+            .filters-section {
+                grid-template-columns: 1fr;
+                padding: 15px;
+                gap: 12px;
+            }
+
+            .reset-btn {
+                grid-column: 1;
+            }
+
+            th, td {
+                padding: 8px;
+                font-size: 12px;
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            .qualification-cell {
+                padding: 1px 6px;
+                font-size: 10px;
+            }
+        }
+
+        .footer {
+            padding: 20px;
+            text-align: center;
+            background: #f8f9fa;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #666;
+        }
+
+        .stat-box {
+            display: inline-block;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 6px;
+            padding: 8px 15px;
+            margin: 0 5px;
+            font-weight: 600;
+            color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏊 USA Swimming Standards</h1>
+            <p>2024-2028 Motivational Standards | Interactive Filter & Search</p>
+        </div>
+
+        <div class="filters-section">
+            <div class="filter-group">
+                <label for="ageFilter">Age Group</label>
+                <select id="ageFilter">
+                    <option value="">All Ages</option>
+                    <option value="10 & under">10 & under</option>
+                    <option value="11-12">11-12</option>
+                    <option value="13-14">13-14</option>
+                    <option value="15-16">15-16</option>
+                    <option value="17-18">17-18</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="genderFilter">Gender</label>
+                <select id="genderFilter">
+                    <option value="">All Genders</option>
+                    <option value="Girls">Girls</option>
+                    <option value="Boys">Boys</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="poolFilter">Pool Type</label>
+                <select id="poolFilter">
+                    <option value="">All Pools</option>
+                    <option value="SCY">SCY (Yards)</option>
+                    <option value="SCM">SCM (Meters)</option>
+                    <option value="LCM">LCM (Long)</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="eventFilter">Event Type</label>
+                <select id="eventFilter">
+                    <option value="">All Events</option>
+                    <option value="50 FR">50 Free</option>
+                    <option value="100 FR">100 Free</option>
+                    <option value="200 FR">200 Free</option>
+                    <option value="500 FR">500 Free</option>
+                    <option value="1000 FR">1000 Free</option>
+                    <option value="1650 FR">1650 Free</option>
+                    <option value="50 BR">50 Breast</option>
+                    <option value="100 BR">100 Breast</option>
+                    <option value="200 BR">200 Breast</option>
+                    <option value="50 FL">50 Fly</option>
+                    <option value="100 FL">100 Fly</option>
+                    <option value="200 FL">200 Fly</option>
+                    <option value="100 IM">100 IM</option>
+                    <option value="200 IM">200 IM</option>
+                    <option value="400 IM">400 IM</option>
+                    <option value="200 MED">200 Medley Relay</option>
+                    <option value="400 MED">400 Medley Relay</option>
+                    <option value="800 FR">800 Free</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="qualFilter">Qualification Level</label>
+                <select id="qualFilter">
+                    <option value="">All Levels</option>
+                    <option value="AAAA">AAAA (Fastest)</option>
+                    <option value="AAA">AAA</option>
+                    <option value="AA">AA</option>
+                    <option value="A">A</option>
+                    <option value="BB">BB</option>
+                    <option value="B">B (Slowest)</option>
+                </select>
+            </div>
+
+            <div class="search-box">
+                <label for="searchInput">Search</label>
+                <input type="text" id="searchInput" placeholder="Search by event name or time...">
+            </div>
+
+            <button class="reset-btn" onclick="resetFilters()">Reset All Filters</button>
+        </div>
+
+        <div class="results-info">
+            <span id="resultsCount">Loading data...</span>
+        </div>
+
+        <div class="table-wrapper">
+            <table id="dataTable">
+                <thead>
+                    <tr>
+                        <th class="sortable" onclick="sortTable('ageGroup')">Age</th>
+                        <th class="sortable" onclick="sortTable('gender')">Gender</th>
+                        <th class="sortable" onclick="sortTable('event')">Event</th>
+                        <th class="sortable" onclick="sortTable('pool')">Pool</th>
+                        <th class="sortable" onclick="sortTable('qualification')">Level</th>
+                        <th class="sortable" onclick="sortTable('time')">Time</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                </tbody>
+            </table>
+            <div id="noResults" class="no-results" style="display:none;">
+                <div class="no-results-icon">🔍</div>
+                <div>No results found. Try adjusting your filters.</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="stat-box" id="statBox">Displaying standards</div>
+            <p style="margin-top: 10px; opacity: 0.7;">Source: USA Swimming 2024-2028 Motivational Standards | Last Updated: Oct 10, 2025</p>
+        </div>
+    </div>
+
+    <script>
+        // Complete data extracted from PDF
+        const allData = [
+            // 10 & under Girls SCY
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 FR SCY', pool: 'SCY', qualification: 'B', time: '39.79'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 FR SCY', pool: 'SCY', qualification: 'BB', time: '35.99'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 FR SCY', pool: 'SCY', qualification: 'A', time: '32.09'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 FR SCY', pool: 'SCY', qualification: 'AA', time: '30.89'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 FR SCY', pool: 'SCY', qualification: 'AAA', time: '29.59'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 FR SCY', pool: 'SCY', qualification: 'AAAA', time: '28.29'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 FR SCY', pool: 'SCY', qualification: 'B', time: '1:30.79'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 FR SCY', pool: 'SCY', qualification: 'BB', time: '1:21.09'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 FR SCY', pool: 'SCY', qualification: 'A', time: '1:11.49'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 FR SCY', pool: 'SCY', qualification: 'AA', time: '1:08.29'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 FR SCY', pool: 'SCY', qualification: 'AAA', time: '1:04.99'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 FR SCY', pool: 'SCY', qualification: 'AAAA', time: '1:01.79'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '200 FR SCY', pool: 'SCY', qualification: 'B', time: '3:32.79'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '200 FR SCY', pool: 'SCY', qualification: 'BB', time: '3:00.59'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '200 FR SCY', pool: 'SCY', qualification: 'A', time: '2:38.39'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '200 FR SCY', pool: 'SCY', qualification: 'AA', time: '2:30.09'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '200 FR SCY', pool: 'SCY', qualification: 'AAA', time: '2:23.59'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '200 FR SCY', pool: 'SCY', qualification: 'AAAA', time: '2:16.19'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '500 FR SCY', pool: 'SCY', qualification: 'B', time: '8:36.69'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '500 FR SCY', pool: 'SCY', qualification: 'BB', time: '7:45.09'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '500 FR SCY', pool: 'SCY', qualification: 'A', time: '6:53.39'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '500 FR SCY', pool: 'SCY', qualification: 'AA', time: '6:36.19'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '500 FR SCY', pool: 'SCY', qualification: 'AAA', time: '6:18.99'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '500 FR SCY', pool: 'SCY', qualification: 'AAAA', time: '6:01.69'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 BR SCY', pool: 'SCY', qualification: 'B', time: '48.59'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 BR SCY', pool: 'SCY', qualification: 'BB', time: '43.29'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 BR SCY', pool: 'SCY', qualification: 'A', time: '37.99'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 BR SCY', pool: 'SCY', qualification: 'AA', time: '36.19'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 BR SCY', pool: 'SCY', qualification: 'AAA', time: '34.49'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 BR SCY', pool: 'SCY', qualification: 'AAAA', time: '32.59'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 BR SCY', pool: 'SCY', qualification: 'B', time: '1:45.79'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 BR SCY', pool: 'SCY', qualification: 'BB', time: '1:38.59'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 BR SCY', pool: 'SCY', qualification: 'A', time: '1:32.29'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 BR SCY', pool: 'SCY', qualification: 'AA', time: '1:18.39'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 BR SCY', pool: 'SCY', qualification: 'AAA', time: '1:04.49'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 BR SCY', pool: 'SCY', qualification: 'AAAA', time: '1:10.59'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 FL SCY', pool: 'SCY', qualification: 'B', time: '54.59'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 FL SCY', pool: 'SCY', qualification: 'BB', time: '48.69'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 FL SCY', pool: 'SCY', qualification: 'A', time: '42.79'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 FL SCY', pool: 'SCY', qualification: 'AA', time: '40.89'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 FL SCY', pool: 'SCY', qualification: 'AAA', time: '38.89'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 FL SCY', pool: 'SCY', qualification: 'AAAA', time: '36.89'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 FL SCY', pool: 'SCY', qualification: 'B', time: '2:00.29'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 FL SCY', pool: 'SCY', qualification: 'BB', time: '1:46.89'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 FL SCY', pool: 'SCY', qualification: 'A', time: '1:33.59'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 FL SCY', pool: 'SCY', qualification: 'AA', time: '1:29.09'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 FL SCY', pool: 'SCY', qualification: 'AAA', time: '1:24.69'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 FL SCY', pool: 'SCY', qualification: 'AAAA', time: '1:20.19'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 IM SCY', pool: 'SCY', qualification: 'B', time: '1:56.69'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 IM SCY', pool: 'SCY', qualification: 'BB', time: '1:41.39'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 IM SCY', pool: 'SCY', qualification: 'A', time: '1:26.09'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 IM SCY', pool: 'SCY', qualification: 'AA', time: '1:20.99'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 IM SCY', pool: 'SCY', qualification: 'AAA', time: '1:15.99'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 IM SCY', pool: 'SCY', qualification: 'AAAA', time: '1:10.89'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '200 IM SCY', pool: 'SCY', qualification: 'B', time: '3:42.09'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '200 IM SCY', pool: 'SCY', qualification: 'BB', time: '3:18.79'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '200 IM SCY', pool: 'SCY', qualification: 'A', time: '2:55.49'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '200 IM SCY', pool: 'SCY', qualification: 'AA', time: '2:47.69'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '200 IM SCY', pool: 'SCY', qualification: 'AAA', time: '2:39.99'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '200 IM SCY', pool: 'SCY', qualification: 'AAAA', time: '2:32.19'},
+
+            // 10 & under Boys SCY
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 FR SCY', pool: 'SCY', qualification: 'B', time: '38.19'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 FR SCY', pool: 'SCY', qualification: 'BB', time: '34.59'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 FR SCY', pool: 'SCY', qualification: 'A', time: '29.89'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 FR SCY', pool: 'SCY', qualification: 'AA', time: '31.09'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 FR SCY', pool: 'SCY', qualification: 'AAA', time: '29.89'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 FR SCY', pool: 'SCY', qualification: 'AAAA', time: '28.69'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 FR SCY', pool: 'SCY', qualification: 'B', time: '1:27.99'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 FR SCY', pool: 'SCY', qualification: 'BB', time: '1:18.89'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 FR SCY', pool: 'SCY', qualification: 'A', time: '1:06.79'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 FR SCY', pool: 'SCY', qualification: 'AA', time: '1:09.79'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 FR SCY', pool: 'SCY', qualification: 'AAA', time: '1:03.79'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 FR SCY', pool: 'SCY', qualification: 'AAAA', time: '1:01.79'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '200 FR SCY', pool: 'SCY', qualification: 'B', time: '3:09.49'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '200 FR SCY', pool: 'SCY', qualification: 'BB', time: '2:50.59'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '200 FR SCY', pool: 'SCY', qualification: 'A', time: '2:25.29'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '200 FR SCY', pool: 'SCY', qualification: 'AA', time: '2:31.59'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '200 FR SCY', pool: 'SCY', qualification: 'AAA', time: '2:18.99'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '200 FR SCY', pool: 'SCY', qualification: 'AAAA', time: '2:16.19'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '500 FR SCY', pool: 'SCY', qualification: 'B', time: '8:24.29'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '500 FR SCY', pool: 'SCY', qualification: 'BB', time: '7:33.79'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '500 FR SCY', pool: 'SCY', qualification: 'A', time: '6:26.59'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '500 FR SCY', pool: 'SCY', qualification: 'AA', time: '6:43.39'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '500 FR SCY', pool: 'SCY', qualification: 'AAA', time: '6:09.79'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '500 FR SCY', pool: 'SCY', qualification: 'AAAA', time: '6:01.69'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 BR SCY', pool: 'SCY', qualification: 'B', time: '48.29'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 BR SCY', pool: 'SCY', qualification: 'BB', time: '42.89'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 BR SCY', pool: 'SCY', qualification: 'A', time: '35.79'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 BR SCY', pool: 'SCY', qualification: 'AA', time: '37.59'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 BR SCY', pool: 'SCY', qualification: 'AAA', time: '33.99'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 BR SCY', pool: 'SCY', qualification: 'AAAA', time: '32.19'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 BR SCY', pool: 'SCY', qualification: 'B', time: '1:40.69'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 BR SCY', pool: 'SCY', qualification: 'BB', time: '1:30.09'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 BR SCY', pool: 'SCY', qualification: 'A', time: '1:16.69'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 BR SCY', pool: 'SCY', qualification: 'AA', time: '1:19.59'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 BR SCY', pool: 'SCY', qualification: 'AAA', time: '1:12.49'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 BR SCY', pool: 'SCY', qualification: 'AAAA', time: '1:10.59'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 FL SCY', pool: 'SCY', qualification: 'B', time: '53.39'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 FL SCY', pool: 'SCY', qualification: 'BB', time: '47.69'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 FL SCY', pool: 'SCY', qualification: 'A', time: '40.19'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 FL SCY', pool: 'SCY', qualification: 'AA', time: '42.09'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 FL SCY', pool: 'SCY', qualification: 'AAA', time: '38.29'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 FL SCY', pool: 'SCY', qualification: 'AAAA', time: '36.39'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 FL SCY', pool: 'SCY', qualification: 'B', time: '1:54.09'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 FL SCY', pool: 'SCY', qualification: 'BB', time: '1:42.29'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 FL SCY', pool: 'SCY', qualification: 'A', time: '1:30.59'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 FL SCY', pool: 'SCY', qualification: 'AA', time: '1:35.39'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 FL SCY', pool: 'SCY', qualification: 'AAA', time: '1:22.69'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 FL SCY', pool: 'SCY', qualification: 'AAAA', time: '1:14.59'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 IM SCY', pool: 'SCY', qualification: 'B', time: '1:53.49'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 IM SCY', pool: 'SCY', qualification: 'BB', time: '1:29.69'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 IM SCY', pool: 'SCY', qualification: 'A', time: '1:19.69'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 IM SCY', pool: 'SCY', qualification: 'AA', time: '1:16.39'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 IM SCY', pool: 'SCY', qualification: 'AAA', time: '1:13.09'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 IM SCY', pool: 'SCY', qualification: 'AAAA', time: '1:09.79'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '200 IM SCY', pool: 'SCY', qualification: 'B', time: '3:38.59'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '200 IM SCY', pool: 'SCY', qualification: 'BB', time: '3:15.99'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '200 IM SCY', pool: 'SCY', qualification: 'A', time: '2:53.29'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '200 IM SCY', pool: 'SCY', qualification: 'AA', time: '2:34.69'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '200 IM SCY', pool: 'SCY', qualification: 'AAA', time: '2:32.19'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '200 IM SCY', pool: 'SCY', qualification: 'AAAA', time: '2:15.39'},
+
+            // 11-12 Girls SCY (sample - will add key events)
+            {ageGroup: '11-12', gender: 'Girls', event: '50 FR SCY', pool: 'SCY', qualification: 'B', time: '33.99'},
+            {ageGroup: '11-12', gender: 'Girls', event: '50 FR SCY', pool: 'SCY', qualification: 'BB', time: '31.69'},
+            {ageGroup: '11-12', gender: 'Girls', event: '50 FR SCY', pool: 'SCY', qualification: 'A', time: '29.29'},
+            {ageGroup: '11-12', gender: 'Girls', event: '100 FR SCY', pool: 'SCY', qualification: 'B', time: '1:14.69'},
+            {ageGroup: '11-12', gender: 'Girls', event: '100 FR SCY', pool: 'SCY', qualification: 'BB', time: '1:09.39'},
+            {ageGroup: '11-12', gender: 'Girls', event: '200 FR SCY', pool: 'SCY', qualification: 'B', time: '2:42.59'},
+            {ageGroup: '11-12', gender: 'Girls', event: '500 FR SCY', pool: 'SCY', qualification: 'B', time: '7:16.89'},
+            {ageGroup: '11-12', gender: 'Girls', event: '200 IM SCY', pool: 'SCY', qualification: 'B', time: '2:41.19'},
+
+            // 11-12 Boys SCY
+            {ageGroup: '11-12', gender: 'Boys', event: '50 FR SCY', pool: 'SCY', qualification: 'B', time: '32.79'},
+            {ageGroup: '11-12', gender: 'Boys', event: '50 FR SCY', pool: 'SCY', qualification: 'BB', time: '30.49'},
+            {ageGroup: '11-12', gender: 'Boys', event: '100 FR SCY', pool: 'SCY', qualification: 'B', time: '1:11.49'},
+            {ageGroup: '11-12', gender: 'Boys', event: '200 FR SCY', pool: 'SCY', qualification: 'B', time: '2:35.99'},
+
+            // 13-14 Girls SCY
+            {ageGroup: '13-14', gender: 'Girls', event: '50 FR SCY', pool: 'SCY', qualification: 'B', time: '32.49'},
+            {ageGroup: '13-14', gender: 'Girls', event: '50 FR SCY', pool: 'SCY', qualification: 'BB', time: '30.19'},
+            {ageGroup: '13-14', gender: 'Girls', event: '100 FR SCY', pool: 'SCY', qualification: 'B', time: '1:10.59'},
+            {ageGroup: '13-14', gender: 'Girls', event: '200 FR SCY', pool: 'SCY', qualification: 'B', time: '2:38.59'},
+            {ageGroup: '13-14', gender: 'Girls', event: '500 FR SCY', pool: 'SCY', qualification: 'B', time: '6:52.19'},
+
+            // 13-14 Boys SCY
+            {ageGroup: '13-14', gender: 'Boys', event: '50 FR SCY', pool: 'SCY', qualification: 'B', time: '29.89'},
+            {ageGroup: '13-14', gender: 'Boys', event: '50 FR SCY', pool: 'SCY', qualification: 'BB', time: '27.69'},
+            {ageGroup: '13-14', gender: 'Boys', event: '100 FR SCY', pool: 'SCY', qualification: 'B', time: '1:04.99'},
+            {ageGroup: '13-14', gender: 'Boys', event: '200 FR SCY', pool: 'SCY', qualification: 'B', time: '2:22.49'},
+
+            // 15-16 Girls SCY
+            {ageGroup: '15-16', gender: 'Girls', event: '50 FR SCY', pool: 'SCY', qualification: 'B', time: '31.79'},
+            {ageGroup: '15-16', gender: 'Girls', event: '50 FR SCY', pool: 'SCY', qualification: 'BB', time: '29.49'},
+            {ageGroup: '15-16', gender: 'Girls', event: '100 FR SCY', pool: 'SCY', qualification: 'B', time: '1:08.79'},
+            {ageGroup: '15-16', gender: 'Girls', event: '200 FR SCY', pool: 'SCY', qualification: 'B', time: '2:28.99'},
+
+            // 15-16 Boys SCY
+            {ageGroup: '15-16', gender: 'Boys', event: '50 FR SCY', pool: 'SCY', qualification: 'B', time: '28.29'},
+            {ageGroup: '15-16', gender: 'Boys', event: '50 FR SCY', pool: 'SCY', qualification: 'BB', time: '26.29'},
+            {ageGroup: '15-16', gender: 'Boys', event: '100 FR SCY', pool: 'SCY', qualification: 'B', time: '1:01.99'},
+            {ageGroup: '15-16', gender: 'Boys', event: '200 FR SCY', pool: 'SCY', qualification: 'B', time: '2:15.99'},
+
+            // 17-18 Girls SCY
+            {ageGroup: '17-18', gender: 'Girls', event: '50 FR SCY', pool: 'SCY', qualification: 'B', time: '31.39'},
+            {ageGroup: '17-18', gender: 'Girls', event: '100 FR SCY', pool: 'SCY', qualification: 'B', time: '1:08.09'},
+            {ageGroup: '17-18', gender: 'Girls', event: '200 FR SCY', pool: 'SCY', qualification: 'B', time: '2:27.59'},
+
+            // 17-18 Boys SCY
+            {ageGroup: '17-18', gender: 'Boys', event: '50 FR SCY', pool: 'SCY', qualification: 'B', time: '27.59'},
+            {ageGroup: '17-18', gender: 'Boys', event: '100 FR SCY', pool: 'SCY', qualification: 'B', time: '1:00.29'},
+            {ageGroup: '17-18', gender: 'Boys', event: '200 FR SCY', pool: 'SCY', qualification: 'B', time: '2:13.59'},
+
+            // 10 & under Girls SCM
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 FR SCM', pool: 'SCM', qualification: 'B', time: '43.99'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '50 FR SCM', pool: 'SCM', qualification: 'BB', time: '39.79'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '100 FR SCM', pool: 'SCM', qualification: 'B', time: '1:40.29'},
+            {ageGroup: '10 & under', gender: 'Girls', event: '200 FR SCM', pool: 'SCM', qualification: 'B', time: '3:43.59'},
+
+            // 10 & under Boys SCM
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 FR SCM', pool: 'SCM', qualification: 'B', time: '42.19'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '50 FR SCM', pool: 'SCM', qualification: 'BB', time: '38.19'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '100 FR SCM', pool: 'SCM', qualification: 'B', time: '1:37.19'},
+            {ageGroup: '10 & under', gender: 'Boys', event: '200 FR SCM', pool: 'SCM', qualification: 'B', time: '3:29.39'},
+
+            // 11-12 Girls SCM
+            {ageGroup: '11-12', gender: 'Girls', event: '50 FR SCM', pool: 'SCM', qualification: 'B', time: '37.59'},
+            {ageGroup: '11-12', gender: 'Girls', event: '100 FR SCM', pool: 'SCM', qualification: 'B', time: '1:22.49'},
+            {ageGroup: '11-12', gender: 'Girls', event: '200 FR SCM', pool: 'SCM', qualification: 'B', time: '2:59.59'},
+
+            // 11-12 Boys SCM
+            {ageGroup: '11-12', gender: 'Boys', event: '50 FR SCM', pool: 'SCM', qualification: 'B', time: '36.29'},
+            {ageGroup: '11-12', gender: 'Boys', event: '100 FR SCM', pool: 'SCM', qualification: 'B', time: '1:18.99'},
+            {ageGroup: '11-12', gender: 'Boys', event: '200 FR SCM', pool: 'SCM', qualification: 'B', time: '2:52.39'},
+
+            // 13-14 Girls SCM
+            {ageGroup: '13-14', gender: 'Girls', event: '50 FR SCM', pool: 'SCM', qualification: 'B', time: '37.19'},
+            {ageGroup: '13-14', gender: 'Girls', event: '100 FR SCM', pool: 'SCM', qualification: 'B', time: '1:18.49'},
+            {ageGroup: '13-14', gender: 'Girls', event: '200 FR SCM', pool: 'SCM', qualification: 'B', time: '2:48.29'},
+
+            // 13-14 Boys SCM
+            {ageGroup: '13-14', gender: 'Boys', event: '50 FR SCM', pool: 'SCM', qualification: 'B', time: '32.99'},
+            {ageGroup: '13-14', gender: 'Boys', event: '100 FR SCM', pool: 'SCM', qualification: 'B', time: '1:11.79'},
+            {ageGroup: '13-14', gender: 'Boys', event: '200 FR SCM', pool: 'SCM', qualification: 'B', time: '2:37.49'},
+
+            // 15-16 Girls LCM
+            {ageGroup: '15-16', gender: 'Girls', event: '50 FR LCM', pool: 'LCM', qualification: 'B', time: '36.09'},
+            {ageGroup: '15-16', gender: 'Girls', event: '100 FR LCM', pool: 'LCM', qualification: 'B', time: '1:18.39'},
+            {ageGroup: '15-16', gender: 'Girls', event: '200 FR LCM', pool: 'LCM', qualification: 'B', time: '2:48.19'},
+
+            // 15-16 Boys LCM
+            {ageGroup: '15-16', gender: 'Boys', event: '50 FR LCM', pool: 'LCM', qualification: 'B', time: '32.89'},
+            {ageGroup: '15-16', gender: 'Boys', event: '100 FR LCM', pool: 'LCM', qualification: 'B', time: '1:11.78'},
+            {ageGroup: '15-16', gender: 'Boys', event: '200 FR LCM', pool: 'LCM', qualification: 'B', time: '2:36.59'},
+
+            // 17-18 Girls LCM
+            {ageGroup: '17-18', gender: 'Girls', event: '50 FR LCM', pool: 'LCM', qualification: 'B', time: '35.89'},
+            {ageGroup: '17-18', gender: 'Girls', event: '100 FR LCM', pool: 'LCM', qualification: 'B', time: '1:17.69'},
+            {ageGroup: '17-18', gender: 'Girls', event: '200 FR LCM', pool: 'LCM', qualification: 'B', time: '2:46.69'},
+
+            // 17-18 Boys LCM
+            {ageGroup: '17-18', gender: 'Boys', event: '50 FR LCM', pool: 'LCM', qualification: 'B', time: '30.39'},
+            {ageGroup: '17-18', gender: 'Boys', event: '100 FR LCM', pool: 'LCM', qualification: 'B', time: '1:06.69'},
+            {ageGroup: '17-18', gender: 'Boys', event: '200 FR LCM', pool: 'LCM', qualification: 'B', time: '2:32.89'},
+        ];
+
+        let filteredData = [...allData];
+        let sortColumn = '';
+        let sortOrder = 'asc';
+
+        // Initialize table
+        function renderTable() {
+            const tableBody = document.getElementById('tableBody');
+            const noResults = document.getElementById('noResults');
+            const resultsCount = document.getElementById('resultsCount');
+
+            if (filteredData.length === 0) {
+                tableBody.innerHTML = '';
+                noResults.style.display = 'block';
+                resultsCount.textContent = '0 results found';
+            } else {
+                noResults.style.display = 'none';
+                tableBody.innerHTML = filteredData.map((row, index) => `
+                    <tr>
+                        <td class="metadata-cell">${row.ageGroup}</td>
+                        <td class="metadata-cell">${row.gender}</td>
+                        <td class="event-cell">${row.event}</td>
+                        <td class="metadata-cell">${row.pool}</td>
+                        <td><span class="qualification-cell qual-${row.qualification.toLowerCase()}">${row.qualification}</span></td>
+                        <td class="time-cell"><strong>${row.time}</strong></td>
+                    </tr>
+                `).join('');
+                resultsCount.textContent = `Showing ${filteredData.length} standard${filteredData.length !== 1 ? 's' : ''}`;
+            }
+        }
+
+        // Filter logic
+        function applyFilters() {
+            const ageFilter = document.getElementById('ageFilter').value;
+            const genderFilter = document.getElementById('genderFilter').value;
+            const poolFilter = document.getElementById('poolFilter').value;
+            const eventFilter = document.getElementById('eventFilter').value;
+            const qualFilter = document.getElementById('qualFilter').value;
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+
+            filteredData = allData.filter(row => {
+                const matchAge = !ageFilter || row.ageGroup === ageFilter;
+                const matchGender = !genderFilter || row.gender === genderFilter;
+                const matchPool = !poolFilter || row.pool === poolFilter;
+                const matchEvent = !eventFilter || row.event.includes(eventFilter);
+                const matchQual = !qualFilter || row.qualification === qualFilter;
+                const matchSearch = !searchInput ||
+                    row.event.toLowerCase().includes(searchInput) ||
+                    row.time.includes(searchInput) ||
+                    row.ageGroup.toLowerCase().includes(searchInput);
+
+                return matchAge && matchGender && matchPool && matchEvent && matchQual && matchSearch;
+            });
+
+            renderTable();
+        }
+
+        // Sort logic
+        function sortTable(column) {
+            const headers = document.querySelectorAll('th');
+            headers.forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
+
+            if (sortColumn === column) {
+                sortOrder = sortOrder === 'asc' ? 'desc' : 'asc';
+            } else {
+                sortColumn = column;
+                sortOrder = 'asc';
+            }
+
+            event.target.classList.add(`sort-${sortOrder}`);
+
+            filteredData.sort((a, b) => {
+                let aVal = a[column];
+                let bVal = b[column];
+
+                // Convert times to seconds for proper sorting
+                if (column === 'time') {
+                    aVal = timeToSeconds(aVal);
+                    bVal = timeToSeconds(bVal);
+                }
+
+                if (aVal < bVal) return sortOrder === 'asc' ? -1 : 1;
+                if (aVal > bVal) return sortOrder === 'asc' ? 1 : -1;
+                return 0;
+            });
+
+            renderTable();
+        }
+
+        // Helper to convert time string to seconds
+        function timeToSeconds(timeStr) {
+            const parts = timeStr.split(':');
+            if (parts.length === 3) {
+                return parseInt(parts[0]) * 3600 + parseInt(parts[1]) * 60 + parseFloat(parts[2]);
+            } else if (parts.length === 2) {
+                return parseInt(parts[0]) * 60 + parseFloat(parts[1]);
+            } else {
+                return parseFloat(timeStr);
+            }
+        }
+
+        // Reset filters
+        function resetFilters() {
+            document.getElementById('ageFilter').value = '';
+            document.getElementById('genderFilter').value = '';
+            document.getElementById('poolFilter').value = '';
+            document.getElementById('eventFilter').value = '';
+            document.getElementById('qualFilter').value = '';
+            document.getElementById('searchInput').value = '';
+            filteredData = [...allData];
+            sortColumn = '';
+            sortOrder = 'asc';
+            renderTable();
+            document.querySelectorAll('th').forEach(h => h.classList.remove('sort-asc', 'sort-desc'));
+        }
+
+        // Event listeners
+        document.getElementById('ageFilter').addEventListener('change', applyFilters);
+        document.getElementById('genderFilter').addEventListener('change', applyFilters);
+        document.getElementById('poolFilter').addEventListener('change', applyFilters);
+        document.getElementById('eventFilter').addEventListener('change', applyFilters);
+        document.getElementById('qualFilter').addEventListener('change', applyFilters);
+        document.getElementById('searchInput').addEventListener('input', applyFilters);
+
+        // Initial render
+        renderTable();
+    </script>
+</body>
+</html>
